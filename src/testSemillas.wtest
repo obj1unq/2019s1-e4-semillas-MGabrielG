@@ -1,0 +1,112 @@
+import semillas.*
+
+describe "tests de plantas" {
+	
+	const m1 = new Menta(altura = 1, anyoDeObtencion = 2010)
+	const m2 = new Menta(altura = 0.3, anyoDeObtencion = 2010)
+	const s1 = new Soja(altura = 0.4, anyoDeObtencion = 2010)
+	const s2 = new Soja(altura = 1, anyoDeObtencion = 2010)
+	const s3 = new Soja(altura = 2, anyoDeObtencion = 2010)
+	const s4 = new Soja(altura = 2, anyoDeObtencion = 2007)
+	const q1 = new Quinoa(altura = 2, anyoDeObtencion = 2005, toleranciaAlSol = 11)
+	const q2 = new Quinoa(altura = 2, anyoDeObtencion = 2005, toleranciaAlSol = 10)
+	const q3 = new Quinoa(altura = 2, anyoDeObtencion = 2004, toleranciaAlSol = 11)
+	const q4 = new Quinoa(altura = 2, anyoDeObtencion = 2004, toleranciaAlSol = 10)
+	const t3 = new SojaTransgenica(altura = 2, anyoDeObtencion = 2010)
+	const h1 = new HierbaBuena(altura = 1, anyoDeObtencion = 2010)
+	const h2 = new HierbaBuena(altura = 0.3, anyoDeObtencion = 2010)
+
+	const p1 = new Parcela (ancho = 4, largo = 3, horasDeSolPorDia = 3, plantas = [q1])
+	const p2 = new Parcela (ancho = 3, largo = 3, horasDeSolPorDia = 3, plantas = [q2])		
+	const p3 = new Parcela (ancho = 3, largo = 3, horasDeSolPorDia = 10, plantas = [q1, q2, q3, q1, q2, q3])		
+	const p4 = new Parcela (ancho = 3, largo = 3, horasDeSolPorDia = 12, plantas = [q1, q2, q3, q1, q2])
+
+//	fixture { }
+
+	test "menta1"{
+		assert.that(m1.daNuevasSemillas())
+		assert.that(m1.espacio() == 3)
+	}
+	
+	test "menta2" {
+		assert.notThat(m2.daNuevasSemillas())
+		assert.that(m2.espacio() == 0.9)
+	}
+	
+	test "soja1" {
+		assert.that(s1.toleranciaAlSol() == 6)
+		assert.notThat(s1.daNuevasSemillas())
+		assert.that(s1.espacio() == 0.2)
+	}
+	
+	test "soja2" {
+		assert.that(s2.toleranciaAlSol() == 7)
+		assert.notThat(s2.daNuevasSemillas())
+		assert.that(s2.espacio() == 0.5)
+	}
+	
+	test "soja3" {
+		assert.that(s3.toleranciaAlSol() == 9)
+		assert.that(s3.daNuevasSemillas())
+		assert.that(s3.espacio() == 1)
+	}
+	
+	test "soja4" {
+		assert.that(s4.toleranciaAlSol() == 9)
+		assert.notThat(s4.daNuevasSemillas())
+		assert.that(s4.espacio() == 1)
+	}
+	
+	test "quinoa da semillas" {
+		assert.that(q1.daNuevasSemillas())
+		assert.notThat(q2.daNuevasSemillas())
+		assert.that(q3.daNuevasSemillas())
+		assert.that(q4.daNuevasSemillas())
+	}
+	
+	test "soja transgenica 3" {
+		assert.that(t3.toleranciaAlSol() == 9)
+		assert.notThat(t3.daNuevasSemillas())
+		assert.that(t3.espacio() == 1)
+	}
+
+		test "hierbabuena1"{
+		assert.that(h1.daNuevasSemillas())
+		assert.that(h1.espacio() == 6)
+	}
+	
+	test "hierbabuena2" {
+		assert.notThat(h2.daNuevasSemillas())
+		assert.that(h2.espacio() == 1.8)
+	}
+	test "parcela1" {
+		assert.that(p1.superficie() == 12)
+		assert.that(p1.cantidadMaximaPlantas() == 2)
+	}	
+	test "parcela2" {
+		assert.that(p2.superficie() == 9)
+		assert.that(p2.cantidadMaximaPlantas() == 6)
+	}	
+	
+	
+	test "parcela3" {
+		assert.notThat(p3.tieneComplicaciones())
+		assert.that(p3.cantidadMaximaPlantas() == 6)
+	}	
+	
+	test "parcela4" {
+		assert.that(p4.tieneComplicaciones())
+		assert.that(p4.cantidadMaximaPlantas() == 6)
+	}	
+	
+	test "parcela3 no puede aniadir plantas" {
+		assert.throwsExceptionWithMessage("No caben mas plantas", {p3.plantar(q1)})
+	}
+	test "parcela4 no puede aniadir la planta por poca tolerancia al sol" {
+		assert.throwsExceptionWithMessage("La planta no tolera la cantidad de sol de la parcela", {p4.plantar(q2)})
+	}
+	test "parcela4 puede aniadir la planta por tolerancia al sol y espacio" {
+		p4.plantar(q3)
+		assert.that(p4.plantas() == [q1, q2, q3, q1, q2, q3])
+	}
+}
